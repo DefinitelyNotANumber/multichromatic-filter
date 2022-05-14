@@ -48,9 +48,6 @@ int G = 0; // green
 int B = 0; // blue
 int a = 0; // alpha
 
-int32_t w, h, n, n1, cx, cy, cx1, cy1, cn, cn1;
-uint8_t tsa, tsb, tsc, ds;
-
 void setup() {
   Serial.begin(9600);
   gfx->begin();
