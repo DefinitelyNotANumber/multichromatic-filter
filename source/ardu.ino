@@ -50,6 +50,15 @@ int a = 0; // alpha
 
 void setup() {
   Serial.begin(9600);
+  pinMode(modeSwitch, INPUT_PULLUP);
+  pinMode(colNegSwitch, INPUT_PULLUP);
+  pinMode(outSwitch, INPUT_PULLUP);
+  pinMode(negLED, OUTPUT);
+  pinMode(outLED, OUTPUT);
+  
+  pinMode(TFT_BL, OUTPUT);
+  digitalWrite(TFT_BL, HIGH);
+  
   gfx->begin();
   lcd.init(); // initialize the info LCD
   lcd.backlight(); // light up the backlight 
