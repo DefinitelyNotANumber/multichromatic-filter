@@ -34,6 +34,8 @@ limitations under the License.
 #define POT_Y A2  // yellow/blue
 #define POT_K A3  // key/alpha
 
+const int RANGE = 255 / 1023;
+
 unsigned char C = 0;  // cyan
 unsigned char M = 0;  // magenta
 unsigned char Y = 0;  // yellow
@@ -42,8 +44,6 @@ unsigned char K = 0;  // key
 unsigned char R = 0;  // red
 unsigned char G = 0;  // green
 unsigned char B = 0;  // blue
-
-const int RANGE = 255 / 1023;
 
 Arduino_DataBus *bus = new Arduino_HWSPI(TFT_DC, TFT_CS);
 Arduino_GFX *gfx = new Arduino_SSD1283A(bus, TFT_RST, 0 /* rotation */); // ^ bus and gfx pinout config
@@ -94,12 +94,9 @@ void loop() {
     Y = analogRead(POT_Y) * RANGE;
     K = analogRead(POT_K) * RANGE;  // ^ setting CMYK values
     
-    if (M > Y) R = M - Y + K;
-    else R = Y - M + K;
-    if (C > Y) G = C - Y + K;
-    else G = Y - C + K;
-    if (C > M) B = C - M + K;
-    else B = M - C + K;
+    R = abs(M - Y) + K;
+    G = abs(C - Y) + K;
+    B = abs(C - M) + K;
   }
   else {
     a = 255 - analogRead(POT_K) * RANGE;
