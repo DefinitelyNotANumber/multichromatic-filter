@@ -94,24 +94,28 @@ void loop() {
     M = analogRead(POT_M) * RANGE;
     Y = analogRead(POT_Y) * RANGE;
     K = analogRead(POT_K) * RANGE;  // ^ setting CMYK values
-    R = M - Y + K;
-    G = C - Y + K;
-    B = C - M + K;
+    
+    if (M > Y) R = M - Y + K;
+    else R = Y - M + K;
+    if (C > Y) G = C - Y + K;
+    else G = Y - C + K;
+    if (C > M) B = C - M + K;
+    else B = M - C + K;
   }
   else {
-    int sensorValue = analogRead(POT_K);
-    a = 255 - sensorValue * RANGE;
-    if (a == 0) ++a;
-    auto RANGE_A = RANGE / a;
+    a = 255 - analogRead(POT_K) * RANGE;
+    if (a == 0) auto RANGE_A = 0;
+    else auto RANGE_A = RANGE - a / 1023;
     R = analogRead(POT_C) * RANGE_A;
     G = analogRead(POT_M) * RANGE_A;
     B = analogRead(POT_Y) * RANGE_A;  // ^ setting RGB alpha values directly
   }
 
   if (digitalRead(COL_NEG_SWITCH) == LOW) { // setting the output color to a negative of what's set
-    R = 255 / a - R;
-    G = 255 / a - G;
-    B = 255 / a - B;
+    a = 255 - a;
+    R = 255 - a - R;
+    G = 255 - a - G;
+    B = 255 - a - B;
     digitalWrite(NEG_LED, HIGH); // indicating that color negating is on
   }
   else digitalWrite(NEG_LED, LOW);
