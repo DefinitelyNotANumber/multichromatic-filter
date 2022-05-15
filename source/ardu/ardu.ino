@@ -45,7 +45,7 @@ unsigned char B = 0;  // blue
 
 const int RANGE = 255 / 1023;
 
-Arduino_DataBus *bus = new Arduino_NRFXSPI(TFT_DC, TFT_CS, 13 /* SCK */, 11 /* MOSI */, 12 /* MISO */);
+Arduino_DataBus *bus = new Arduino_HWSPI(TFT_DC, TFT_CS);
 Arduino_GFX *gfx = new Arduino_SSD1283A(bus, TFT_RST, 0 /* rotation */); // ^ bus and gfx pinout config
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);  // I2C address 0x27, 16 columns and 2 rows
@@ -104,11 +104,9 @@ void loop() {
   }
   else {
     a = 255 - analogRead(POT_K) * RANGE;
-    if (a == 0) auto RANGE_A = 0;
-    else auto RANGE_A = RANGE - a / 1023;
-    R = analogRead(POT_C) * RANGE_A;
-    G = analogRead(POT_M) * RANGE_A;
-    B = analogRead(POT_Y) * RANGE_A;  // ^ setting RGB alpha values directly
+    R = analogRead(POT_C) * RANGE - a / 1023;
+    G = analogRead(POT_M) * RANGE - a / 1023;
+    B = analogRead(POT_Y) * RANGE - a / 1023;  // ^ setting RGB alpha values directly
   }
 
   if (digitalRead(COL_NEG_SWITCH) == LOW) { // setting the output color to a negative of what's set
@@ -158,7 +156,7 @@ void loop() {
   }
 
   if (digitalRead(OUT_SWITCH) == LOW) {
-    gfx->fillScreen(gfx->color565(R, G, B));  // writing set RGB values to the main LCD
+    gfx->fillScreen(gfx->color565(255 - R, 255 - G, 255 - B));  // writing set RGB values to the main LCD
     digitalWrite(OUT_LED, HIGH);
   }
   else {
