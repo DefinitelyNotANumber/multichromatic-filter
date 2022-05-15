@@ -57,7 +57,6 @@ void showStartupScreen() {
   for (int i = 0; i <= 10; ++i) {  // startup info, blinking for two seconds
     if (i % 2 == 0) {
       lcd.clear();
-      lcd.home();
       lcd.print("Starting up..");
     }
     else {
