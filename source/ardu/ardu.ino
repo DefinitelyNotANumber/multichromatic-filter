@@ -142,14 +142,14 @@ void loop() {
   else {
     lcd.setCursor(0, 0);
     lcd.print("R ");
-    lcd.print(analogRead(POT_C) * RANGE);
+    lcd.print(255 - analogRead(POT_C) * RANGE);
     lcd.print(", ");
     lcd.setCursor(7, 0);
     lcd.print("G ");
-    lcd.print(analogRead(POT_M) * RANGE);
+    lcd.print(255 - analogRead(POT_M) * RANGE);
     lcd.setCursor(0, 2);
     lcd.print("B ");
-    lcd.print(analogRead(POT_Y) * RANGE);
+    lcd.print(255 - analogRead(POT_Y) * RANGE);
     lcd.print(", ");
     lcd.setCursor(7, 2);
     lcd.print("a ");
@@ -162,7 +162,7 @@ void loop() {
     digitalWrite(OUT_LED, HIGH);
   }
   else {
-    gfx->fillScreen(BLACK);  // clearing out the main LCD if output enable switch is off
+    gfx->fillScreen(WHITE);  // clearing out the main LCD if output enable switch is off
     digitalWrite(OUT_LED, LOW);
   }
 }
