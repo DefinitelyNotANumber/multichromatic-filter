@@ -55,7 +55,6 @@ void showStartupScreen() {
   for (int i = 0; i <= 10; ++i) {  // startup info, blinking for two seconds
     if (i % 2 == 0) {
       lcd.clear();
-      lcd.home();
       lcd.print("Starting up..");
     }
     else {
@@ -88,23 +87,23 @@ void setup() {
 
 void loop() {
   if (digitalRead(MODE_SWITCH) == LOW) {
-    C = analogRead(POT_C) * (255.0 / 1023.0);
-    M = analogRead(POT_M) * (255.0 / 1023.0);
-    Y = analogRead(POT_Y) * (255.0 / 1023.0);
-    K = analogRead(POT_K) * (255.0 / 1023.0);  // ^ setting CMYK values
+    C = analogRead(POT_C) * 0.249266; // 0.249266 = 255/1023
+    M = analogRead(POT_M) * 0.249266;
+    Y = analogRead(POT_Y) * 0.249266;
+    K = analogRead(POT_K) * 0.249266;  // ^ setting CMYK values
     
-    if (M > Y) R = M - Y + K;
-    else R = Y - M + K;
-    if (C > Y) G = C - Y + K;
-    else G = Y - C + K;
-    if (C > M) B = C - M + K;
-    else B = M - C + K;
+    R = abs(M - Y) + K;
+    if (R > 255) R = 255;
+    G = abs(C - Y) + K;
+    if (G > 255) G = 255;
+    B = abs(C - M) + K;
+    if (B > 255) B = 255;
   }
   else {
-    a = 255 - analogRead(POT_K) * (255.0 / 1023.0);
-    R = analogRead(POT_C) * (255.0 / 1023.0) - a / 1023;
-    G = analogRead(POT_M) * (255.0 / 1023.0) - a / 1023;
-    B = analogRead(POT_Y) * (255.0 / 1023.0) - a / 1023;  // ^ setting RGB alpha values directly
+    a = 255 - analogRead(POT_K) * 0.249266;
+    R = analogRead(POT_C) * 0.249266 - a / 1023;
+    G = analogRead(POT_M) * 0.249266 - a / 1023;
+    B = analogRead(POT_Y) * 0.249266 - a / 1023;  // ^ setting RGB alpha values directly
   }
 
   if (digitalRead(COL_NEG_SWITCH) == LOW) { // setting the output color to a negative of what's set
@@ -138,14 +137,14 @@ void loop() {
   else {
     lcd.setCursor(0, 0);
     lcd.print("R ");
-    lcd.print(255 - analogRead(POT_C) * (255.0 / 1023.0), 0);
+    lcd.print(255 - analogRead(POT_C) * 0.249266, 0);
     lcd.print(", ");
     lcd.setCursor(7, 0);
     lcd.print("G ");
-    lcd.print(255 - analogRead(POT_M) * (255.0 / 1023.0), 0);
+    lcd.print(255 - analogRead(POT_M) * 0.249266, 0);
     lcd.setCursor(0, 1);
     lcd.print("B ");
-    lcd.print(255 - analogRead(POT_Y) * (255.0 / 1023.0), 0);
+    lcd.print(255 - analogRead(POT_Y) * 0.249266, 0);
     lcd.print(", ");
     lcd.setCursor(7, 1);
     lcd.print("a ");
