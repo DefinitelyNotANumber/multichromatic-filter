@@ -23,27 +23,25 @@ limitations under the License.
 #define TFT_RST 7
 #define TFT_BL 6   // ^ additional pins for the LCD
 
-#define MODE_SWITCH 1     // RGB alpha/CMYK switch
+#define MODE_SWITCH 10     // RGB alpha/CMYK switch
 #define COL_NEG_SWITCH 2  // color negate switch
 #define NEG_LED 3         // LED indicating if the color is negated or not
 #define OUT_SWITCH 4      // output enable switch
 #define OUT_LED 5         // output enable LED indicator
 
-#define POT_C A0  // potentiometer used to set cyan/red value (depending on the state of MODE_SWITCH)
+#define POT_C A7  // potentiometer used to set cyan/red value (depending on the state of MODE_SWITCH)
 #define POT_M A1  // magenta/green
 #define POT_Y A2  // yellow/blue
 #define POT_K A3  // key/alpha
 
-unsigned char C = 0;  // cyan
-unsigned char M = 0;  // magenta
-unsigned char Y = 0;  // yellow
-unsigned char K = 0;  // key
+float C = 0;  // cyan
+float M = 0;  // magenta
+float Y = 0;  // yellow
+float K = 0;  // key
 
 unsigned char R = 0;  // red
 unsigned char G = 0;  // green
 unsigned char B = 0;  // blue
-
-const int RANGE = 255 / 1023;
 
 Arduino_DataBus *bus = new Arduino_HWSPI(TFT_DC, TFT_CS);
 Arduino_GFX *gfx = new Arduino_SSD1283A(bus, TFT_RST, 0 /* rotation */); // ^ bus and gfx pinout config
@@ -90,10 +88,10 @@ void setup() {
 
 void loop() {
   if (digitalRead(MODE_SWITCH) == LOW) {
-    C = analogRead(POT_C) * RANGE;
-    M = analogRead(POT_M) * RANGE;
-    Y = analogRead(POT_Y) * RANGE;
-    K = analogRead(POT_K) * RANGE;  // ^ setting CMYK values
+    C = analogRead(POT_C) * (255.0 / 1023.0);
+    M = analogRead(POT_M) * (255.0 / 1023.0);
+    Y = analogRead(POT_Y) * (255.0 / 1023.0);
+    K = analogRead(POT_K) * (255.0 / 1023.0);  // ^ setting CMYK values
     
     if (M > Y) R = M - Y + K;
     else R = Y - M + K;
@@ -103,10 +101,10 @@ void loop() {
     else B = M - C + K;
   }
   else {
-    a = 255 - analogRead(POT_K) * RANGE;
-    R = analogRead(POT_C) * RANGE - a / 1023;
-    G = analogRead(POT_M) * RANGE - a / 1023;
-    B = analogRead(POT_Y) * RANGE - a / 1023;  // ^ setting RGB alpha values directly
+    a = 255 - analogRead(POT_K) * (255.0 / 1023.0);
+    R = analogRead(POT_C) * (255.0 / 1023.0) - a / 1023;
+    G = analogRead(POT_M) * (255.0 / 1023.0) - a / 1023;
+    B = analogRead(POT_Y) * (255.0 / 1023.0) - a / 1023;  // ^ setting RGB alpha values directly
   }
 
   if (digitalRead(COL_NEG_SWITCH) == LOW) { // setting the output color to a negative of what's set
@@ -124,34 +122,34 @@ void loop() {
   if (digitalRead(MODE_SWITCH) == LOW) {
     lcd.setCursor(0, 0);
     lcd.print("C ");
-    lcd.print(C);
+    lcd.print(255 - C, 0);
     lcd.print(", ");
     lcd.setCursor(7, 0);
     lcd.print("M ");
-    lcd.print(M);
-    lcd.setCursor(0, 2);
+    lcd.print(255 - M, 0);
+    lcd.setCursor(0, 1);
     lcd.print("Y ");
-    lcd.print(Y);
+    lcd.print(255 - Y, 0);
     lcd.print(", ");
-    lcd.setCursor(7, 2);
+    lcd.setCursor(7, 1);
     lcd.print("K ");
-    lcd.print(K); // ^ displaying CMYK values
+    lcd.print(255 - K, 0); // ^ displaying CMYK values
   }
   else {
     lcd.setCursor(0, 0);
     lcd.print("R ");
-    lcd.print(255 - analogRead(POT_C) * RANGE);
+    lcd.print(255 - analogRead(POT_C) * (255.0 / 1023.0), 0);
     lcd.print(", ");
     lcd.setCursor(7, 0);
     lcd.print("G ");
-    lcd.print(255 - analogRead(POT_M) * RANGE);
-    lcd.setCursor(0, 2);
+    lcd.print(255 - analogRead(POT_M) * (255.0 / 1023.0), 0);
+    lcd.setCursor(0, 1);
     lcd.print("B ");
-    lcd.print(255 - analogRead(POT_Y) * RANGE);
+    lcd.print(255 - analogRead(POT_Y) * (255.0 / 1023.0), 0);
     lcd.print(", ");
-    lcd.setCursor(7, 2);
+    lcd.setCursor(7, 1);
     lcd.print("a ");
-    lcd.print(100 - analogRead(POT_K) * (100 / 1023));
+    lcd.print(100 - analogRead(POT_K) * (100.0 / 1023.0), 0);
     lcd.print("%");  // ^ displaying RGB alpha values
   }
 
@@ -163,4 +161,5 @@ void loop() {
     gfx->fillScreen(WHITE);  // clearing out the main LCD if output enable switch is off
     digitalWrite(OUT_LED, LOW);
   }
+  delay(200);
 }
